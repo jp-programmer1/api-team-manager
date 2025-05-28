@@ -38,7 +38,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('joinRoom')
   handleJoinRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { roomId: string; },
+    @MessageBody() data: { roomId: string },
   ) {
     try {
       const { roomId } = data;
@@ -56,7 +56,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // Notificar a los demás usuarios
       this.server.to(roomId).emit(
         'userJoined',
-        room.users.map((user) => ({ id: user.id, username: user.username })),
+        room.users.map((user) => ({
+          id: user.id,
+          username: user.username,
+          voted: user.hasVoted,
+        })),
       );
     } catch (error) {
       this.logger.error('Error al unirse a la sala:', error);
@@ -71,16 +75,14 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() voteDto: VoteDto,
   ) {
     try {
-      const { roomId, username, vote } = voteDto;
-      const room = this.roomsService.vote(roomId, username, vote);
+      const { roomId, userId, vote } = voteDto;
+      this.roomsService.vote(roomId, userId, vote);
 
       // Notificar a todos en la sala sobre el voto (pero sin revelar el voto)
       this.server.to(roomId).emit('userVoted', {
-        username,
+        userId,
         hasVoted: true,
       });
-
-      this.logger.log(`Usuario ${username} votó en la sala ${roomId}`);
     } catch (error) {
       this.logger.error('Error al registrar voto:', error);
       client.emit('error', { message: 'Error al registrar voto' });
@@ -99,7 +101,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // Enviar los votos revelados a todos en la sala
       this.server.to(roomId).emit('votesRevealed', {
         users: room.users.map((user) => ({
-          username: user.username,
+          id: user.id,
           vote: user.vote,
         })),
         showVotes: room.showVotes,
@@ -122,7 +124,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const room = this.roomsService.resetVotes(roomId);
 
       // Notificar a todos en la sala que los votos se han reiniciado
-      this.server.to(roomId).emit('votesReset', { roomId });
+      this.server.to(roomId).emit('votesReset', { room });
 
       this.logger.log(`Votos reiniciados en la sala ${roomId}`);
     } catch (error) {

@@ -7,7 +7,7 @@ export class VoteDto {
 
   @IsString()
   @IsNotEmpty()
-  username: string;
+  userId: string;
 
   @IsString()
   @IsNotEmpty()

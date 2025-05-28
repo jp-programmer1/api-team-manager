@@ -9,7 +9,7 @@ export class RoomsService {
   createRoom(name: string, username: string): Room {
     const roomId = uuidv4();
     const userId = uuidv4();
-    
+
     const user: User = {
       id: userId,
       username,
@@ -21,6 +21,7 @@ export class RoomsService {
       name,
       users: [user],
       showVotes: false,
+      ownerId: userId,
       createdAt: new Date(),
     };
 
@@ -28,9 +29,9 @@ export class RoomsService {
     return room;
   }
 
-  joinRoom(roomId: string, username: string): Room {
+  joinRoom(roomId: string, username: string): Room & { userId: string } {
     const room = this.rooms.get(roomId);
-    
+
     if (!room) {
       throw new NotFoundException('Sala no encontrada');
     }
@@ -43,18 +44,21 @@ export class RoomsService {
     };
 
     room.users.push(user);
-    
-    return room;
+
+    return {
+      ...room,
+      userId,
+    };
   }
 
   vote(roomId: string, userId: string, vote: string): Room {
     const room = this.rooms.get(roomId);
-    
+
     if (!room) {
       throw new NotFoundException('Sala no encontrada');
     }
 
-    const user = room.users.find(u => u.id === userId);
+    const user = room.users.find((u) => u.id === userId);
     if (!user) {
       throw new NotFoundException('Usuario no encontrado en la sala');
     }
@@ -67,12 +71,12 @@ export class RoomsService {
 
   resetVotes(roomId: string): Room {
     const room = this.rooms.get(roomId);
-    
+
     if (!room) {
       throw new NotFoundException('Sala no encontrada');
     }
 
-    room.users.forEach(user => {
+    room.users.forEach((user) => {
       user.vote = undefined;
       user.hasVoted = false;
     });
@@ -83,7 +87,7 @@ export class RoomsService {
 
   revealVotes(roomId: string): Room {
     const room = this.rooms.get(roomId);
-    
+
     if (!room) {
       throw new NotFoundException('Sala no encontrada');
     }
@@ -94,7 +98,7 @@ export class RoomsService {
 
   getRoom(roomId: string): Room {
     const room = this.rooms.get(roomId);
-    
+
     if (!room) {
       throw new NotFoundException('Sala no encontrada');
     }
@@ -104,13 +108,13 @@ export class RoomsService {
 
   removeUser(roomId: string, userId: string): Room {
     const room = this.rooms.get(roomId);
-    
+
     if (!room) {
       throw new NotFoundException('Sala no encontrada');
     }
 
-    room.users = room.users.filter(user => user.id !== userId);
-    
+    room.users = room.users.filter((user) => user.id !== userId);
+
     // Si no quedan usuarios, eliminamos la sala
     if (room.users.length === 0) {
       this.rooms.delete(roomId);

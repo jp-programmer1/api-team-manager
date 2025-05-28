@@ -1,18 +1,13 @@
-import { 
-  Body, 
-  Controller, 
-  Get, 
-  Param, 
-  Post, 
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
   Delete,
-  NotFoundException 
+  NotFoundException,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
-  ApiParam 
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from '../common/dtos/create-room.dto';
 import { JoinRoomDto } from '../common/dtos/join-room.dto';
@@ -28,8 +23,8 @@ export class RoomsController {
   @ApiResponse({ status: 201, description: 'Sala creada exitosamente' })
   createRoom(@Body() createRoomDto: CreateRoomDto) {
     return this.roomsService.createRoom(
-      createRoomDto.name, 
-      createRoomDto.username
+      createRoomDto.name,
+      createRoomDto.username,
     );
   }
 
@@ -46,11 +41,7 @@ export class RoomsController {
   @ApiResponse({ status: 200, description: 'Voto registrado exitosamente' })
   @ApiResponse({ status: 404, description: 'Sala o usuario no encontrado' })
   vote(@Body() voteDto: VoteDto) {
-    return this.roomsService.vote(
-      voteDto.roomId, 
-      voteDto.username, 
-      voteDto.vote
-    );
+    return this.roomsService.vote(voteDto.roomId, voteDto.userId, voteDto.vote);
   }
 
   @Post(':id/reset')
@@ -90,10 +81,7 @@ export class RoomsController {
   @ApiParam({ name: 'userId', description: 'ID del usuario' })
   @ApiResponse({ status: 200, description: 'Usuario eliminado exitosamente' })
   @ApiResponse({ status: 404, description: 'Sala no encontrada' })
-  removeUser(
-    @Param('roomId') roomId: string,
-    @Param('userId') userId: string,
-  ) {
+  removeUser(@Param('roomId') roomId: string, @Param('userId') userId: string) {
     return this.roomsService.removeUser(roomId, userId);
   }
 }

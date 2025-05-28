@@ -8,6 +8,7 @@ export interface User {
 export interface Room {
   id: string;
   name: string;
+  ownerId: string;
   users: User[];
   showVotes: boolean;
   createdAt: Date;

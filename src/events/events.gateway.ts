@@ -185,4 +185,41 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.emit('error', { message: 'Error al enviar información GitLab' });
     }
   }
+
+  @SubscribeMessage('setSelectedIssue')
+  setSelectedIssue(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    data: {
+      roomId: string;
+      issueIid: number;
+    },
+  ) {
+    try {
+      const { roomId } = data;
+      const inform = this.roomsService.updateSelectedIssue(
+        roomId,
+        data.issueIid,
+      );
+      this.server.to(roomId).emit('updateSelectedIssue', inform);
+    } catch (error) {
+      this.logger.error('Error al enviar información GitLab:', error);
+      client.emit('error', { message: 'Error al enviar información GitLab' });
+    }
+  }
+
+  @SubscribeMessage('closeRoom')
+  closeRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { roomId: string },
+  ) {
+    try {
+      const { roomId } = data;
+      this.roomsService.removeRoom(roomId);
+      this.server.to(roomId).emit('roomRemoved', roomId);
+    } catch (error) {
+      this.logger.error('Error al eliminar sala:', error);
+      client.emit('error', { message: 'Error al eliminar sala' });
+    }
+  }
 }

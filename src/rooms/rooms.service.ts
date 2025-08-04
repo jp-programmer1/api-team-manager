@@ -6,7 +6,6 @@ import {
   Room,
   User,
 } from '../common/interfaces/room.interface';
-import { UrlWithStringQuery } from 'node:url';
 
 @Injectable()
 export class RoomsService {
@@ -107,6 +106,8 @@ export class RoomsService {
   getRoom(roomId: string): Room {
     const room = this.rooms.get(roomId);
 
+    console.log(room);
+
     if (!room) {
       throw new NotFoundException('Sala no encontrada');
     }
@@ -165,5 +166,20 @@ export class RoomsService {
       return issue;
     });
     return room;
+  }
+
+  updateSelectedIssue(roomId: string, iid: number) {
+    const room = this.rooms.get(roomId);
+
+    if (!room || !room.informGitlab) {
+      throw new NotFoundException('Sala no encontrada');
+    }
+
+    room.selectedIssueIid = iid;
+    return room;
+  }
+
+  removeRoom(roomId: string) {
+    this.rooms.delete(roomId);
   }
 }

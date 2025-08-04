@@ -13,6 +13,7 @@ export interface Room {
   showVotes: boolean;
   userId?: number;
   createdAt: Date;
+  selectedIssueIid?: number;
   informGitlab?: {
     iteration: GitlabIteration;
     issues: GitlabIssues[];

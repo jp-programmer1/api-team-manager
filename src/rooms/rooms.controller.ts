@@ -88,4 +88,13 @@ export class RoomsController {
   removeUser(@Param('roomId') roomId: string, @Param('userId') userId: number) {
     return this.roomsService.removeUser(roomId, userId);
   }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Eliminar una sala' })
+  @ApiParam({ name: 'id', description: 'ID de la sala' })
+  @ApiResponse({ status: 200, description: 'Sala eliminada exitosamente' })
+  @ApiResponse({ status: 404, description: 'Sala no encontrada' })
+  removeRoom(@Param('id') roomId: string) {
+    return this.roomsService.removeRoom(roomId);
+  }
 }

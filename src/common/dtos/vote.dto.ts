@@ -1,13 +1,13 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class VoteDto {
   @IsString()
   @IsNotEmpty()
   roomId: string;
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  userId: string;
+  userId: number;
 
   @IsString()
   @IsNotEmpty()

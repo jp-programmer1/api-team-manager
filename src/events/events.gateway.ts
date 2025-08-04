@@ -11,6 +11,10 @@ import { Server, Socket } from 'socket.io';
 import { Logger, UsePipes, ValidationPipe } from '@nestjs/common';
 import { RoomsService } from '../rooms/rooms.service';
 import { VoteDto } from '../common/dtos/vote.dto';
+import {
+  GitlabIssues,
+  GitlabIteration,
+} from 'src/common/interfaces/room.interface';
 
 @WebSocketGateway({
   cors: {
@@ -76,6 +80,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     try {
       const { roomId, userId, vote } = voteDto;
+      console.log('voteDto', voteDto);
+
       this.roomsService.vote(roomId, userId, vote);
 
       // Notificar a todos en la sala sobre el voto (pero sin revelar el voto)
@@ -130,6 +136,53 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } catch (error) {
       this.logger.error('Error al reiniciar votos:', error);
       client.emit('error', { message: 'Error al reiniciar votos' });
+    }
+  }
+
+  @SubscribeMessage('informGitlab')
+  connectGitlab(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    data: {
+      roomId: string;
+      iteration: GitlabIteration;
+      issues: GitlabIssues[];
+    },
+  ) {
+    try {
+      const { roomId } = data;
+      const inform = this.roomsService.informGitlab(roomId, {
+        iteration: data.iteration,
+        issues: data.issues,
+      });
+      this.server.to(roomId).emit('updateInformGitlab', inform);
+    } catch (error) {
+      this.logger.error('Error al enviar información GitLab:', error);
+      client.emit('error', { message: 'Error al enviar información GitLab' });
+    }
+  }
+
+  @SubscribeMessage('setWeight')
+  setWeight(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    data: {
+      roomId: string;
+      issueIid: number;
+      weight: number;
+    },
+  ) {
+    try {
+      const { roomId } = data;
+      const inform = this.roomsService.updateWeightIssues(
+        roomId,
+        data.weight,
+        data.issueIid,
+      );
+      this.server.to(roomId).emit('updateInformGitlab', inform);
+    } catch (error) {
+      this.logger.error('Error al enviar información GitLab:', error);
+      client.emit('error', { message: 'Error al enviar información GitLab' });
     }
   }
 }

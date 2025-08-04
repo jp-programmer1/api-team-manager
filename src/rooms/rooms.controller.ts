@@ -22,10 +22,10 @@ export class RoomsController {
   @ApiOperation({ summary: 'Crear una nueva sala de Planning Poker' })
   @ApiResponse({ status: 201, description: 'Sala creada exitosamente' })
   createRoom(@Body() createRoomDto: CreateRoomDto) {
-    return this.roomsService.createRoom(
-      createRoomDto.name,
-      createRoomDto.username,
-    );
+    return this.roomsService.createRoom(createRoomDto.name, {
+      username: createRoomDto.username,
+      userId: createRoomDto.userId,
+    });
   }
 
   @Post('join')
@@ -33,7 +33,11 @@ export class RoomsController {
   @ApiResponse({ status: 200, description: 'Unido a la sala exitosamente' })
   @ApiResponse({ status: 404, description: 'Sala no encontrada' })
   joinRoom(@Body() joinRoomDto: JoinRoomDto) {
-    return this.roomsService.joinRoom(joinRoomDto.roomId, joinRoomDto.username);
+    return this.roomsService.joinRoom(
+      joinRoomDto.roomId,
+      joinRoomDto.username,
+      joinRoomDto.userId,
+    );
   }
 
   @Post('vote')
@@ -81,7 +85,7 @@ export class RoomsController {
   @ApiParam({ name: 'userId', description: 'ID del usuario' })
   @ApiResponse({ status: 200, description: 'Usuario eliminado exitosamente' })
   @ApiResponse({ status: 404, description: 'Sala no encontrada' })
-  removeUser(@Param('roomId') roomId: string, @Param('userId') userId: string) {
+  removeUser(@Param('roomId') roomId: string, @Param('userId') userId: number) {
     return this.roomsService.removeUser(roomId, userId);
   }
 }

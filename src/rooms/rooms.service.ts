@@ -1,14 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { Room, User } from '../common/interfaces/room.interface';
+import {
+  GitlabIssues,
+  GitlabIteration,
+  Room,
+  User,
+} from '../common/interfaces/room.interface';
+import { UrlWithStringQuery } from 'node:url';
 
 @Injectable()
 export class RoomsService {
   private rooms: Map<string, Room> = new Map();
 
-  createRoom(name: string, username: string): Room {
+  createRoom(
+    name: string,
+    { username, userId }: { username: string; userId: number },
+  ): Room {
     const roomId = uuidv4();
-    const userId = uuidv4();
 
     const user: User = {
       id: userId,
@@ -29,14 +37,13 @@ export class RoomsService {
     return room;
   }
 
-  joinRoom(roomId: string, username: string): Room & { userId: string } {
+  joinRoom(roomId: string, username: string, userId: number): Room {
     const room = this.rooms.get(roomId);
 
     if (!room) {
       throw new NotFoundException('Sala no encontrada');
     }
 
-    const userId = uuidv4();
     const user: User = {
       id: userId,
       username,
@@ -51,7 +58,7 @@ export class RoomsService {
     };
   }
 
-  vote(roomId: string, userId: string, vote: string): Room {
+  vote(roomId: string, userId: number, vote: string): Room {
     const room = this.rooms.get(roomId);
 
     if (!room) {
@@ -59,6 +66,7 @@ export class RoomsService {
     }
 
     const user = room.users.find((u) => u.id === userId);
+    console.log(user);
     if (!user) {
       throw new NotFoundException('Usuario no encontrado en la sala');
     }
@@ -106,7 +114,7 @@ export class RoomsService {
     return room;
   }
 
-  removeUser(roomId: string, userId: string): Room {
+  removeUser(roomId: string, userId: number): Room {
     const room = this.rooms.get(roomId);
 
     if (!room) {
@@ -120,6 +128,42 @@ export class RoomsService {
       this.rooms.delete(roomId);
     }
 
+    return room;
+  }
+
+  informGitlab(
+    roomId: string,
+    {
+      iteration,
+      issues,
+    }: { iteration: GitlabIteration; issues: GitlabIssues[] },
+  ): Room {
+    const room = this.rooms.get(roomId);
+
+    if (!room) {
+      throw new NotFoundException('Sala no encontrada');
+    }
+
+    room.informGitlab = {
+      iteration,
+      issues,
+    };
+    return room;
+  }
+
+  updateWeightIssues(roomId: string, weight: number, iid: number) {
+    const room = this.rooms.get(roomId);
+
+    if (!room || !room.informGitlab) {
+      throw new NotFoundException('Sala no encontrada');
+    }
+
+    room.informGitlab.issues = room.informGitlab.issues.map((issue) => {
+      if (issue.iid === iid) {
+        issue.weight = weight;
+      }
+      return issue;
+    });
     return room;
   }
 }

@@ -9,7 +9,10 @@ async function bootstrap() {
 
   // Habilitar CORS
   app.enableCors({
-    origin: ['https://team-manager-ipbi.onrender.com', 'http://localhost:5173'],
+    origin: [
+      'https://team-manager-production-a807.up.railway.app',
+      'http://localhost:5173',
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });

@@ -31,7 +31,7 @@ Real-time Planning Poker API built with NestJS and WebSockets. It enables agile 
 
 1. Clone the repository:
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/jp-programmer1/api-team-manager
    cd planning-poker-node
    ```
 

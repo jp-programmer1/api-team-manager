@@ -1,9 +1,13 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
 
 export class JoinRoomDto {
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   roomId: string;
+
+  @IsString()
+  @IsOptional()
+  nanoId: string;
 
   @IsString()
   @IsNotEmpty()

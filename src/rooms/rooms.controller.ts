@@ -37,6 +37,7 @@ export class RoomsController {
       joinRoomDto.roomId,
       joinRoomDto.username,
       joinRoomDto.userId,
+      joinRoomDto.nanoId,
     );
   }
 

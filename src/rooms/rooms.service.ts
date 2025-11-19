@@ -38,17 +38,27 @@ export class RoomsService {
     return room;
   }
 
-  joinRoom(roomId: string, username: string, userId: number): Room {
-    const room = this.rooms.get(roomId);
+  joinRoom(
+    roomId: string,
+    username: string,
+    userId: number,
+    nanoId?: string,
+  ): Room {
+    let room: Room | null = null;
+
+    for (const [key, value] of this.rooms) {
+      if (key === roomId || value.nanoId === nanoId) {
+        room = value;
+        break;
+      }
+    }
 
     if (!room) {
       throw new NotFoundException('Sala no encontrada');
     }
 
     if (room.users.find((u) => u.id === userId)) {
-      throw new NotFoundException(
-        `Usuario ${username} ya se encuentra en la sala`,
-      );
+      return room;
     }
 
     const user: User = {

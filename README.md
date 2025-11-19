@@ -8,139 +8,151 @@
 [![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![WebSocket](https://img.shields.io/badge/WebSocket-000000?style=for-the-badge&logo=websocket&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
 
-## Descripción
+## Overview
 
-API para un juego de Planning Poker en tiempo real construida con NestJS y WebSockets. Esta aplicación permite a los equipos de desarrollo realizar estimaciones ágiles de manera colaborativa.
+Real-time Planning Poker API built with NestJS and WebSockets. It enables agile teams to estimate collaboratively with rooms, anonymous voting, vote reveal, and resets.
 
-## Características
+## Features
 
-- ✅ Creación de salas de juego
-- ✅ Conexión en tiempo real con WebSockets
-- ✅ Sistema de votación anónima
-- ✅ Revelación de votos
-- ✅ Reinicio de votaciones
-- ✅ Documentación automática con Swagger
+- ✅ Create and manage rooms
+- ✅ Real-time updates via WebSockets (Socket.IO)
+- ✅ Anonymous voting flow
+- ✅ Reveal votes
+- ✅ Reset votes
+- ✅ Auto-generated API docs with Swagger
 
-## Requisitos Previos
+## Prerequisites
 
-- Node.js (v14 o superior)
-- npm (v6 o superior) o yarn
-- Nest CLI (opcional, para desarrollo)
+- Node.js v14 or newer
+- npm or yarn
+- Nest CLI (optional, for local development)
 
-## Instalación
+## Installation
 
-1. Clona el repositorio:
+1. Clone the repository:
    ```bash
-   git clone https://github.com/tu-usuario/planning-poker-node.git
+   git clone <your-repo-url>
    cd planning-poker-node
    ```
 
-2. Instala las dependencias:
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-3. Configura las variables de entorno (opcional):
-   Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
+3. Environment variables (optional):
+   Create a `.env` file in the project root:
    ```
    PORT=3000
    ```
 
-4. Inicia el servidor de desarrollo:
+4. Start the development server:
    ```bash
    npm run start:dev
    ```
 
-   La aplicación estará disponible en `http://localhost:3000`  
-   La documentación de la API estará disponible en `http://localhost:3000/api`
+   App: `http://localhost:3000`
+   Swagger UI: `http://localhost:3000/api`
 
-## Uso
+## Usage
 
-### Endpoints HTTP
+### HTTP Endpoints
 
-- `POST /rooms` - Crea una nueva sala
-- `POST /rooms/join` - Únete a una sala existente
-- `POST /rooms/vote` - Emite un voto
-- `POST /rooms/:id/reset` - Reinicia los votos de una sala
-- `POST /rooms/:id/reveal` - Revela los votos de una sala
-- `GET /rooms/:id` - Obtiene la información de una sala
-- `DELETE /rooms/:roomId/users/:userId` - Elimina un usuario de una sala
+- `POST /rooms` - Create a new room
+- `POST /rooms/join` - Join an existing room
+- `POST /rooms/vote` - Cast a vote
+- `POST /rooms/:id/reset` - Reset votes of a room
+- `POST /rooms/:id/reveal` - Reveal votes of a room
+- `GET /rooms/:id` - Get room info
+- `DELETE /rooms/:roomId/users/:userId` - Remove a user from a room
 
-### Eventos WebSocket
+### WebSocket Events
 
-La aplicación utiliza el espacio de nombres `/poker` para los WebSockets. Los eventos disponibles son:
+Namespace: `/poker`
 
-- `joinRoom` - Unirse a una sala
-- `vote` - Emitir un voto
-- `revealVotes` - Revelar los votos
-- `resetVotes` - Reiniciar los votos
+Incoming events (client -> server):
+- `joinRoom` { roomId }
+- `vote` { roomId, userId, vote }
+- `revealVotes` { roomId }
+- `resetVotes` { roomId }
+- `informGitlab` { roomId, iteration, issues }
+- `setWeight` { roomId, issueIid, weight }
+- `setSelectedIssue` { roomId, issueIid }
+- `closeRoom` { roomId }
 
-### Ejemplo de Uso con cURL
+Outgoing events (server -> clients):
+- `userJoined` [{ id, username, voted }]
+- `userVoted` { userId, hasVoted }
+- `votesRevealed` { users: [{ id, vote }], showVotes }
+- `votesReset` { room }
+- `updateInformGitlab` { ...room }
+- `updateSelectedIssue` { ...room }
+- `roomRemoved` roomId
+- `error` { message }
 
-1. **Crear una sala:**
+### cURL Examples
+
+1. Create a room
    ```bash
    curl -X POST http://localhost:3000/rooms \
      -H "Content-Type: application/json" \
-     -d '{"name":"Sprint 15","username":"Juan"}'
+     -d '{"name":"Sprint 15","username":"Juan","userId":1}'
    ```
 
-2. **Unirse a una sala:**
+2. Join a room
    ```bash
    curl -X POST http://localhost:3000/rooms/join \
      -H "Content-Type: application/json" \
-     -d '{"roomId":"room-id-aqui","username":"María"}'
+     -d '{"roomId":"<room-id>","username":"Maria","userId":2}'
    ```
 
-3. **Emitir un voto:**
+3. Cast a vote
    ```bash
    curl -X POST http://localhost:3000/rooms/vote \
      -H "Content-Type: application/json" \
-     -d '{"roomId":"room-id-aqui","username":"Juan","vote":"5"}'
+     -d '{"roomId":"<room-id>","userId":1,"vote":"5"}'
    ```
 
-## Estructura del Proyecto
+## Project Structure
 
 ```
 src/
-├── common/               # Código compartido
-│   ├── dtos/             # Objetos de transferencia de datos
-│   └── interfaces/       # Interfaces de TypeScript
-├── events/               # Lógica de WebSockets
-├── rooms/                # Módulo de salas
-└── app.module.ts         # Módulo principal
+├── common/               # Shared code
+│   ├── dtos/             # Data transfer objects (DTOs)
+│   └── interfaces/       # TypeScript interfaces
+├── events/               # WebSocket gateway and logic
+├── rooms/                # Rooms module (controller/service)
+└── app.module.ts         # Root module
 ```
 
-## Scripts Disponibles
+## Available Scripts
 
-- `npm run start` - Inicia la aplicación en producción
-- `npm run start:dev` - Inicia la aplicación en modo desarrollo con recarga en caliente
-- `npm run build` - Compila la aplicación TypeScript a JavaScript
-- `npm run format` - Formatea el código usando Prettier
-- `npm run lint` - Ejecuta el linter en el código
-- `npm test` - Ejecuta las pruebas unitarias
-- `npm run test:watch` - Ejecuta las pruebas en modo observación
-- `npm run test:cov` - Ejecuta las pruebas con cobertura
+- `npm run start` - Start the app
+- `npm run start:dev` - Start in watch mode
+- `npm run build` - Compile TypeScript
+- `npm run format` - Format code with Prettier
+- `npm run lint` - Lint code with ESLint
+- `npm test` - Run unit tests
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:cov` - Run tests with coverage
 
-## Despliegue
+## Deployment
 
-Para desplegar la aplicación en producción:
+To build and run in production:
 
 ```bash
-# Construir la aplicación
 npm run build
-
-# Iniciar la aplicación en producción
 npm run start:prod
 ```
 
-## Contribución
+## Contributing
 
-Las contribuciones son bienvenidas. Por favor, lee las [pautas de contribución](CONTRIBUTING.md) para más detalles.
+Contributions are welcome. Please read the [contribution guidelines](CONTRIBUTING.md) for details.
 
-## Soporte
+## Support
 
-Si necesitas ayuda, por favor abre un issue en el repositorio.
+If you need help, please open an issue in the repository.
 
-## Licencia
+## License
 
-Este proyecto está bajo la [Licencia MIT](LICENSE).
+This project is currently marked as `UNLICENSED` in `package.json`.

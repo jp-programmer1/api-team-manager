@@ -80,7 +80,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     try {
       const { roomId, userId, vote } = voteDto;
-      console.log('voteDto', voteDto);
 
       this.roomsService.vote(roomId, userId, vote);
 

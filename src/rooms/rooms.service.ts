@@ -16,6 +16,7 @@ export class RoomsService {
     { username, userId }: { username: string; userId: number },
   ): Room {
     const roomId = uuidv4();
+    const nanoId = uuidv4().substring(0, 5);
 
     const user: User = {
       id: userId,
@@ -25,6 +26,7 @@ export class RoomsService {
 
     const room: Room = {
       id: roomId,
+      nanoId,
       name,
       users: [user],
       showVotes: false,
@@ -41,6 +43,12 @@ export class RoomsService {
 
     if (!room) {
       throw new NotFoundException('Sala no encontrada');
+    }
+
+    if (room.users.find((u) => u.id === userId)) {
+      throw new NotFoundException(
+        `Usuario ${username} ya se encuentra en la sala`,
+      );
     }
 
     const user: User = {
@@ -63,9 +71,7 @@ export class RoomsService {
     if (!room) {
       throw new NotFoundException('Sala no encontrada');
     }
-
     const user = room.users.find((u) => u.id === userId);
-    console.log(user);
     if (!user) {
       throw new NotFoundException('Usuario no encontrado en la sala');
     }
@@ -105,9 +111,6 @@ export class RoomsService {
 
   getRoom(roomId: string): Room {
     const room = this.rooms.get(roomId);
-
-    console.log(room);
-
     if (!room) {
       throw new NotFoundException('Sala no encontrada');
     }

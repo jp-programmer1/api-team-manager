@@ -19,14 +19,27 @@ async function bootstrap() {
 
   // Configuración de Swagger
   const config = new DocumentBuilder()
-    .setTitle('Planning Poker API')
-    .setDescription('API para el juego de Planning Poker')
+    .setTitle('Team Manager API')
+    .setDescription('API para Planning Poker y salas Diff colaborativas')
     .setVersion('1.0')
     .addBearerAuth()
+    .addTag('rooms', 'Gestión de salas de Planning Poker')
+    .addTag('diff', 'Gestión de salas Diff colaborativas')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+      displayRequestDuration: true,
+      filter: true,
+      showExtensions: true,
+      showCommonExtensions: true,
+      docExpansion: 'none',
+      defaultModelsExpandDepth: 2,
+      defaultModelExpandDepth: 2,
+    },
+  });
 
   // Habilitar validación global
   app.useGlobalPipes(
@@ -45,4 +58,4 @@ async function bootstrap() {
   console.log(`Documentación de la API: http://localhost:${port}/api`);
 }
 
-bootstrap();
+void bootstrap();

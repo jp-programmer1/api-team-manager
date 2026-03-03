@@ -6,10 +6,7 @@ import { EventsGateway } from '../events/events.gateway';
 @Module({
   imports: [],
   controllers: [RoomsController],
-  providers: [
-    RoomsService,
-    EventsGateway,
-  ],
+  providers: [RoomsService, EventsGateway],
   exports: [RoomsService],
 })
 export class RoomsModule {}

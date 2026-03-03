@@ -1,14 +1,14 @@
 import { IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class JoinRoomDto {
+export class JoinDiffDto {
   @ApiPropertyOptional({
-    description: 'ID de la sala a la que se quiere unir',
+    description: 'ID de la sala existente',
     example: 'room-123',
   })
   @IsString()
   @IsOptional()
-  roomId: string;
+  roomId?: string;
 
   @ApiPropertyOptional({
     description: 'Nano ID del usuario',
@@ -16,7 +16,15 @@ export class JoinRoomDto {
   })
   @IsString()
   @IsOptional()
-  nanoId: string;
+  nanoId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Nombre de la sala (solo si se está creando una nueva)',
+    example: 'Mi Sala Diff',
+  })
+  @IsString()
+  @IsOptional()
+  name?: string;
 
   @ApiProperty({
     description: 'Nombre del usuario',

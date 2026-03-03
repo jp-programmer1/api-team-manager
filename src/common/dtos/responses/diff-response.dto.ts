@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class DiffUserResponseDto {
   @ApiProperty({
@@ -12,32 +12,32 @@ export class DiffUserResponseDto {
     example: 'Juan Pérez',
   })
   username: string;
-
-  @ApiProperty({
-    description: 'Nano ID del usuario',
-    example: 'abc123def456',
-  })
-  nanoId: string;
 }
 
 export class DiffRoomResponseDto {
   @ApiProperty({
     description: 'ID único de la sala',
-    example: 'room-123',
+    example: 'a1b2c3d4-e5f6-...',
   })
-  roomId: string;
+  id: string;
 
   @ApiProperty({
-    description: 'Nano ID de la sala',
-    example: 'abc123def456',
+    description: 'Nano ID de la sala (identificador corto)',
+    example: 'abc12',
   })
   nanoId: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Nombre de la sala',
     example: 'Mi Sala Diff',
   })
-  name: string;
+  name?: string;
+
+  @ApiProperty({
+    description: 'ID del usuario propietario de la sala',
+    example: 123,
+  })
+  ownerId: number;
 
   @ApiProperty({
     description: 'Lista de usuarios en la sala',
@@ -45,11 +45,17 @@ export class DiffRoomResponseDto {
   })
   users: DiffUserResponseDto[];
 
-  @ApiProperty({
-    description: 'Texto contenido en la sala',
-    example: 'Este es el texto de ejemplo para la sala diff',
+  @ApiPropertyOptional({
+    description: 'Texto del lado original del diff',
+    example: 'const x = 1;',
   })
-  text: string;
+  textOriginal?: string;
+
+  @ApiPropertyOptional({
+    description: 'Texto del lado modificado del diff',
+    example: 'const x = 2;',
+  })
+  textModified?: string;
 
   @ApiProperty({
     description: 'Fecha de creación de la sala',

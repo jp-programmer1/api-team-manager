@@ -62,6 +62,8 @@ export class DiffGateway implements OnGatewayConnection, OnGatewayDisconnect {
         nanoId: room.nanoId,
         name: room.name,
         users: room.users,
+        textOriginal: room.textOriginal ?? '',
+        textModified: room.textModified ?? '',
       });
 
       // Notify others about current users

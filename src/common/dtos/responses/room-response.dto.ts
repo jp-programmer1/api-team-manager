@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UserResponseDto {
   @ApiProperty({
@@ -19,47 +19,37 @@ export class UserResponseDto {
   })
   hasVoted: boolean;
 
-  @ApiProperty({
-    description:
-      'Voto del usuario (null si no ha votado o si los votos no están revelados)',
-    example: '5',
-    required: false,
-  })
-  vote?: string | null;
-}
-
-export class VoteResponseDto {
-  @ApiProperty({
-    description: 'ID del usuario que votó',
-    example: 123,
-  })
-  userId: number;
-
-  @ApiProperty({
-    description: 'Valor del voto',
+  @ApiPropertyOptional({
+    description: 'Voto del usuario (solo visible cuando showVotes es true)',
     example: '5',
   })
-  vote: string;
-
-  @ApiProperty({
-    description: 'Nombre del usuario que votó',
-    example: 'Juan Pérez',
-  })
-  username: string;
+  vote?: string;
 }
 
 export class RoomResponseDto {
   @ApiProperty({
-    description: 'ID único de la sala',
-    example: 'room-123',
+    description: 'ID único de la sala (UUID)',
+    example: 'a1b2c3d4-e5f6-...',
   })
   id: string;
 
   @ApiProperty({
+    description: 'Nano ID de la sala (identificador corto)',
+    example: 'abc12',
+  })
+  nanoId: string;
+
+  @ApiProperty({
     description: 'Nombre de la sala',
-    example: 'Sala de Planning Poker',
+    example: 'Sprint 42',
   })
   name: string;
+
+  @ApiProperty({
+    description: 'ID del usuario propietario de la sala',
+    example: 123,
+  })
+  ownerId: number;
 
   @ApiProperty({
     description: 'Lista de usuarios en la sala',
@@ -68,20 +58,20 @@ export class RoomResponseDto {
   users: UserResponseDto[];
 
   @ApiProperty({
-    description: 'Lista de votos emitidos',
-    type: [VoteResponseDto],
-  })
-  votes: VoteResponseDto[];
-
-  @ApiProperty({
-    description: 'Indica si los votos han sido revelados',
+    description: 'Indica si los votos están visibles para todos',
     example: false,
   })
-  revealed: boolean;
+  showVotes: boolean;
 
   @ApiProperty({
     description: 'Fecha de creación de la sala',
     example: '2024-01-01T00:00:00.000Z',
   })
   createdAt: string;
+
+  @ApiPropertyOptional({
+    description: 'IID del issue de GitLab actualmente seleccionado',
+    example: 42,
+  })
+  selectedIssueIid?: number;
 }

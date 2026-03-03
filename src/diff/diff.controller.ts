@@ -16,6 +16,7 @@ import {
 } from '@nestjs/swagger';
 import { DiffRoomsService } from './diff-rooms.service';
 import { JoinDiffDto } from '../common/dtos/join-diff.dto';
+import { SetTextDto } from '../common/dtos/set-text.dto';
 import { DiffRoomResponseDto } from '../common/dtos/responses/diff-response.dto';
 
 @ApiTags('diff')
@@ -50,6 +51,36 @@ export class DiffController {
     });
   }
 
+  @Post('text')
+  @ApiOperation({
+    summary: 'Establecer el texto de la sala Diff',
+    description:
+      'Actualiza el texto original o modificado de una sala Diff. Todos los participantes verán el cambio en tiempo real vía WebSocket.',
+  })
+  @ApiBody({
+    type: SetTextDto,
+    description: 'Datos para actualizar el texto de la sala',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Texto actualizado exitosamente',
+    type: DiffRoomResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Datos inválidos' })
+  @ApiResponse({ status: 404, description: 'Sala no encontrada' })
+  setText(@Body() setTextDto: SetTextDto) {
+    try {
+      return this.diffRoomsService.setText({
+        roomId: setTextDto.roomId,
+        nanoId: setTextDto.nanoId,
+        text: setTextDto.text,
+        type: setTextDto.type,
+      });
+    } catch (error: unknown) {
+      throw new NotFoundException((error as Error).message);
+    }
+  }
+
   @Get(':id')
   @ApiOperation({
     summary: 'Obtener información de una sala Diff',
@@ -64,7 +95,11 @@ export class DiffController {
   })
   @ApiResponse({ status: 404, description: 'Sala no encontrada' })
   getRoom(@Param('id') roomId: string) {
-    return this.diffRoomsService.getRoom(roomId);
+    try {
+      return this.diffRoomsService.getRoom(roomId);
+    } catch (error: unknown) {
+      throw new NotFoundException((error as Error).message);
+    }
   }
 
   @Delete(':roomId/users/:userId')

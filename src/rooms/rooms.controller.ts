@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Delete,
-  NotFoundException,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Delete } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -86,13 +78,8 @@ export class RoomsController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Voto registrado exitosamente',
-    schema: {
-      example: {
-        success: true,
-        message: 'Voto registrado',
-      },
-    },
+    description: 'Voto registrado. Retorna el estado actualizado de la sala.',
+    type: RoomResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiResponse({ status: 404, description: 'Sala o usuario no encontrado' })
@@ -109,13 +96,8 @@ export class RoomsController {
   @ApiParam({ name: 'id', description: 'ID de la sala', example: 'room-123' })
   @ApiResponse({
     status: 200,
-    description: 'Votos reiniciados exitosamente',
-    schema: {
-      example: {
-        success: true,
-        message: 'Votos reiniciados',
-      },
-    },
+    description: 'Votos reiniciados. Retorna el estado actualizado de la sala.',
+    type: RoomResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Sala no encontrada' })
   resetVotes(@Param('id') roomId: string) {
@@ -131,13 +113,9 @@ export class RoomsController {
   @ApiParam({ name: 'id', description: 'ID de la sala', example: 'room-123' })
   @ApiResponse({
     status: 200,
-    description: 'Votos revelados exitosamente',
-    schema: {
-      example: {
-        success: true,
-        message: 'Votos revelados',
-      },
-    },
+    description:
+      'Votos revelados. Retorna el estado actualizado de la sala con showVotes: true.',
+    type: RoomResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Sala no encontrada' })
   revealVotes(@Param('id') roomId: string) {
@@ -158,11 +136,7 @@ export class RoomsController {
   })
   @ApiResponse({ status: 404, description: 'Sala no encontrada' })
   getRoom(@Param('id') roomId: string) {
-    const room = this.roomsService.getRoom(roomId);
-    if (!room) {
-      throw new NotFoundException('Sala no encontrada');
-    }
-    return room;
+    return this.roomsService.getRoom(roomId);
   }
 
   @Delete(':roomId/users/:userId')
@@ -179,13 +153,8 @@ export class RoomsController {
   @ApiParam({ name: 'userId', description: 'ID del usuario', example: '123' })
   @ApiResponse({
     status: 200,
-    description: 'Usuario eliminado exitosamente',
-    schema: {
-      example: {
-        success: true,
-        message: 'Usuario eliminado de la sala',
-      },
-    },
+    description: 'Usuario eliminado. Retorna el estado actualizado de la sala.',
+    type: RoomResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Sala no encontrada' })
   removeUser(@Param('roomId') roomId: string, @Param('userId') userId: number) {

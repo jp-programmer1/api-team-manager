@@ -9,10 +9,7 @@ async function bootstrap() {
 
   // Habilitar CORS
   app.enableCors({
-    origin: [
-      'https://team-manager-production-a9d8.up.railway.app',
-      'http://localhost:5173',
-    ],
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
